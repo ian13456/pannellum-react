@@ -1,11 +1,11 @@
-import propTypes from "prop-types";
-import React, { PureComponent } from "react";
-import "../pannellum/css/pannellum.css";
-import "../pannellum/css/style-textInfo.css";
+import propTypes from 'prop-types';
+import React, { PureComponent } from 'react';
+import '../pannellum/css/pannellum.css';
+import '../pannellum/css/style-textInfo.css';
 
-import "../pannellum/js/libpannellum.js";
-import "../pannellum/js/pannellum.js";
-import "../pannellum/js/RequestAnimationFrame";
+import '../pannellum/js/libpannellum.js';
+import '../pannellum/js/pannellum.js';
+import '../pannellum/js/RequestAnimationFrame';
 
 class Pannellum extends PureComponent {
   constructor(props) {
@@ -18,10 +18,7 @@ class Pannellum extends PureComponent {
   }
 
   static propTypes = {
-    children: propTypes.oneOfType([
-      propTypes.arrayOf(propTypes.node),
-      propTypes.node
-    ]),
+    children: propTypes.oneOfType([propTypes.arrayOf(propTypes.node), propTypes.node]),
     id: propTypes.string,
     width: propTypes.string,
     height: propTypes.string,
@@ -51,7 +48,7 @@ class Pannellum extends PureComponent {
     keyboardZoom: propTypes.bool,
     mouseZoom: propTypes.bool,
     draggable: propTypes.bool,
-    disableKeyboardCtrl : propTypes.bool,
+    disableKeyboardCtrl: propTypes.bool,
     showFullscreenCtrl: propTypes.bool,
     showControls: propTypes.bool,
     onLoad: propTypes.func,
@@ -70,13 +67,14 @@ class Pannellum extends PureComponent {
     handleClickArg: propTypes.object,
     cssClass: propTypes.string,
     onRender: propTypes.func,
-  };
+    cubeMap: propTypes.arrayOf(propTypes.string)
+  }
 
   static defaultProps = {
     children: [],
-    width: "100%",
-    height: "400px",
-    image: "",
+    width: '100%',
+    height: '400px',
+    image: '',
     haov: 360,
     vaov: 180,
     vOffset: 0,
@@ -91,11 +89,11 @@ class Pannellum extends PureComponent {
     maxYaw: 180,
     autoRotate: 0,
     compass: false,
-    preview: "",
-    previewTitle: "",
-    previewAuthor: "",
-    title: "",
-    author: "",
+    preview: '',
+    previewTitle: '',
+    previewAuthor: '',
+    title: '',
+    author: '',
     autoLoad: false,
     orientationOnByDefault: false,
     showZoomCtrl: true,
@@ -116,7 +114,8 @@ class Pannellum extends PureComponent {
     onTouchend: () => {},
     hotspotDebug: false,
     onRender: null,
-  };
+    cubeMap: []
+  }
 
   renderImage = state => {
     const { children } = this.props;
@@ -126,7 +125,7 @@ class Pannellum extends PureComponent {
     if (Array.isArray(hotspots)) {
       hotspots.map(hotspot => {
         switch (hotspot.props.type) {
-          case "info":
+          case 'info':
             return hotspotArray.push({
               id: Math.random()
                 .toString(36)
@@ -134,31 +133,27 @@ class Pannellum extends PureComponent {
               type: hotspot.props.type,
               pitch: hotspot.props.pitch ? hotspot.props.pitch : 10,
               yaw: hotspot.props.yaw ? hotspot.props.yaw : 10,
-              text: hotspot.props.text ? hotspot.props.text : "",
-              URL: hotspot.props.URL ? hotspot.props.URL : ""
+              text: hotspot.props.text ? hotspot.props.text : '',
+              URL: hotspot.props.URL ? hotspot.props.URL : ''
             });
-          case "custom":
+          case 'custom':
             return hotspotArray.push({
               id: Math.random()
                 .toString(36)
                 .substr(2, 9),
               pitch: hotspot.props.pitch ? hotspot.props.pitch : 10,
               yaw: hotspot.props.yaw ? hotspot.props.yaw : 10,
-              cssClass: hotspot.props.cssClass
-                ? hotspot.props.cssClass
-                : "tooltipcss",
+              cssClass: hotspot.props.cssClass ? hotspot.props.cssClass : 'tooltipcss',
               createTooltipFunc: hotspot.props.tooltip
                 ? hotspot.props.tooltip
                 : this.hotspotTooltip,
-              createTooltipArgs: hotspot.props.tooltipArg
-                ? hotspot.props.tooltipArg
-                : {},
+              createTooltipArgs: hotspot.props.tooltipArg ? hotspot.props.tooltipArg : {},
               clickHandlerFunc: hotspot.props.handleClick
                 ? hotspot.props.handleClick
                 : this.handleClickHotspot,
               clickHandlerArgs: hotspot.props.handleClickArg
                 ? hotspot.props.handleClickArg
-                : { name: "test" }
+                : { name: 'test' }
             });
           default:
             return [];
@@ -167,7 +162,7 @@ class Pannellum extends PureComponent {
     }
 
     let jsonConfig = {
-      type: "equirectangular",
+      type: 'equirectangular',
       panorama: this.props.image,
       haov: this.props.haov,
       vaov: this.props.vaov,
@@ -200,36 +195,36 @@ class Pannellum extends PureComponent {
       hotSpotDebug: this.props.hotspotDebug,
       hotSpots: hotspotArray,
       onRender: this.props.onRender,
+      cubeMap: this.props.cubeMap
     };
 
     Object.keys(jsonConfig).forEach(
-      key => jsonConfig[key] === "" && delete jsonConfig[key]
+      key => jsonConfig[key] === '' && delete jsonConfig[key]
     );
     // this.setState({ jsonConfig });
 
-    if (state === "update") {
+    if (state === 'update') {
       this.panorama.destroy();
-    } 
+    }
     this.panorama = pannellum.viewer(
       this.props.id ? this.props.id : this.state.id,
       jsonConfig
     );
 
-    this.panorama.on("load", this.props.onLoad);
-    this.panorama.on("scenechange", this.props.onScenechange);
-    this.panorama.on("scenechangefadedone", this.props.onScenechangefadedone);
-    this.panorama.on("error", this.props.onError);
-    this.panorama.on("errorcleared", this.props.onErrorcleared);
-    this.panorama.on("mousedown", this.props.onMousedown);
-    this.panorama.on("mouseup", this.props.onMouseup);
-    this.panorama.on("touchstart", this.props.onTouchstart);
-    this.panorama.on("touchend", this.props.onTouchend);
-    
-  };
+    this.panorama.on('load', this.props.onLoad);
+    this.panorama.on('scenechange', this.props.onScenechange);
+    this.panorama.on('scenechangefadedone', this.props.onScenechangefadedone);
+    this.panorama.on('error', this.props.onError);
+    this.panorama.on('errorcleared', this.props.onErrorcleared);
+    this.panorama.on('mousedown', this.props.onMousedown);
+    this.panorama.on('mouseup', this.props.onMouseup);
+    this.panorama.on('touchstart', this.props.onTouchstart);
+    this.panorama.on('touchend', this.props.onTouchend);
+  }
 
   componentDidMount = () => {
-    this.renderImage("mount");
-  };
+    this.renderImage('mount');
+  }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
@@ -247,17 +242,19 @@ class Pannellum extends PureComponent {
       prevProps.showControls !== this.props.showControls ||
       prevProps.children.length !== this.props.children.length
     ) {
-      this.renderImage("update");
+      this.renderImage('update');
     }
-    if (prevProps.maxYaw !== this.props.maxYaw ||
+    if (
+      prevProps.maxYaw !== this.props.maxYaw ||
       prevProps.minYaw !== this.props.minYaw ||
       prevProps.maxPitch !== this.props.maxPitch ||
       prevProps.minPitch !== this.props.minPitch ||
       prevProps.maxHfov !== this.props.maxHfov ||
-      prevProps.minHfov !== this.props.minHfov){
-      this.panorama.setYawBounds([this.props.minYaw,this.props.maxYaw]);
-      this.panorama.setPitchBounds([this.props.minPitch,this.props.maxPitch]);
-      this.panorama.setHfovBounds([this.props.minHfov,this.props.maxHfov]);
+      prevProps.minHfov !== this.props.minHfov
+    ) {
+      this.panorama.setYawBounds([this.props.minYaw, this.props.maxYaw]);
+      this.panorama.setPitchBounds([this.props.minPitch, this.props.maxPitch]);
+      this.panorama.setHfovBounds([this.props.minHfov, this.props.maxHfov]);
     }
     if (prevProps.yaw !== this.props.yaw) {
       this.panorama.setYaw(this.props.yaw);
@@ -271,31 +268,31 @@ class Pannellum extends PureComponent {
   }
 
   handleClickHotspot = (e, args) => {
-    console.log("hotspot clicked", args.name);
-  };
+    console.log('hotspot clicked', args.name);
+  }
 
   hotspotTooltip = (hotSpotDiv, args) => {
-    hotSpotDiv.setAttribute("id", "textInfo");
-    const hDiv = document.createElement("div");
-    hDiv.classList.add("hotspot");
-    const outDiv = document.createElement("div");
-    outDiv.classList.add("out");
-    const inDiv = document.createElement("div");
-    inDiv.classList.add("in");
-    const imageDiv = document.createElement("div");
-    imageDiv.classList.add("image");
+    hotSpotDiv.setAttribute('id', 'textInfo');
+    const hDiv = document.createElement('div');
+    hDiv.classList.add('hotspot');
+    const outDiv = document.createElement('div');
+    outDiv.classList.add('out');
+    const inDiv = document.createElement('div');
+    inDiv.classList.add('in');
+    const imageDiv = document.createElement('div');
+    imageDiv.classList.add('image');
     hotSpotDiv.appendChild(hDiv);
     hDiv.appendChild(inDiv);
     hDiv.appendChild(outDiv);
-  };
+  }
 
   getViewer = () => {
     return this.panorama;
-  };
+  }
 
   forceRender = () => {
-    this.renderImage("update");
-  };
+    this.renderImage('update');
+  }
 
   render() {
     let { width, height } = this.props;
